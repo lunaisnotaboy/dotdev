@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>GitHub web editor</title>
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,shrink-to-fit=no"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="upgrade-insecure-requests"
+    />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="GitHub web editor" />
+    <link rel="apple-touch-icon" href="/apple-icon.png" />
+    <link
+      id="js-favicon"
+      rel="shortcut icon"
+      href="/vscode-stable-favicon.ico"
+    />
+    <link
+      rel="stylesheet"
+      href="/splash-screen-styles.css"
+      id="js-splash-screen-css"
+    />
+    <link rel="stylesheet" href="/primer.css" id="js-primer-css" />
+    <link rel="preconnect" href="https://github.vscode-unpkg.net" />
+    <link rel="preconnect" href="https://vscodeweb.azureedge.net" />
+    <link rel="preconnect" href="https://marketplace.visualstudio.com" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-size: 10px;
+      }
+    </style>
+    <link href="/static/css/webeditor.1d6321d6.chunk.css" rel="stylesheet" />
+  </head>
+  <body aria-label="">
+    <span
+      id="js-keychain-keys"
+      style="display: none"
+      data-keychain-keys=""
+      W3sia2V5IjoiVU9VRlYyL0IvaFJsbHluTHBQbkFDZz09IiwiaWQiOiJ2Ml81ZmQzOGVmZWM3NTA0ZDVhYmE5ODgzMWU0YzMzMjg4NiIsImV4cGlyZXNPbiI6MTYzNTg3Njk3NTgzOX0seyJrZXkiOiJVVkFTSzdycU9DRjViVktxcS9sTUtBPT0iLCJpZCI6InYyXzNkYzUxNzI5M2FjNzRjZTNiNGM2YTg1NDk3NmI4NWMxIiwiZXhwaXJlc09uIjoxNjM1ODc2OTc1OTIxfSx7ImtleSI6Im1ETEVkcUU4WUlYbCtlcFh4ZXdwaHc9PSIsImlkIjoidjJfQkU5NjYwRjdFQzI1NzNFNDc2MkJGODAyREYwQUI2NDAzMzdDN0RGMiIsImV4cGlyZXNPbiI6MTY2NTg2NDU1MDAwMH0seyJrZXkiOiJvVXZGcHUydGF4Y0pxaEpCT1FieHd3PT0iLCJpZCI6InYyXzBDQTM2RjJFMDdCNkI3RTk2NUM1RjgyMEU1NTlGQzU1NjgyQTdERTciLCJleHBpcmVzT24iOjE2NTgyOTYzNjEwMDB9LHsia2V5IjoiVWdycU9nWDcrbXkwTktCcGRxaWRXUT09IiwiaWQiOiJ2Ml82REFFRDA3QTRFN0QyNTUzRDAyNENFMUExN0I0NUREREZGODRFMTNFIiwiZXhwaXJlc09uIjoxNjUwNzI4MDUyMDAwfV0=""
+    ></span>
+    <script nonce="cJy+kJKB2ZtU5NxDRUBHASqkyiM=">
+      const faviconEl = document.querySelector("#js-favicon");
+      const params = new URLSearchParams(location.search);
+      const themeParams = params.get("loadingScreenThemeColor");
+      const baseUrl = "https://vscodeweb.azureedge.net";
+
+      const isGitHub =
+        location.hostname === "github.dev" ||
+        location.hostname === "github.localhost" ||
+        location.hostname.endsWith(".github.dev") ||
+        location.hostname.endsWith(".github.localhost");
+
+      // Define trusted policy.
+      // TODO@osortega: remove default policy and use dompurify
+      const trustedTypesPolicy =
+        window.trustedTypes &&
+        window.trustedTypes.createPolicy("default", {
+          createScriptURL(value) {
+            if (value.startsWith(baseUrl)) {
+              return value;
+            }
+            throw new Error(`Invalid script url: ${value}`);
+          },
+        });
+
+      // theme setting from query param should overrride all theme settings.
+      let isDarkTheme = undefined;
+      switch (themeParams) {
+        case "dark":
+          isDarkTheme = true;
+          break;
+        case "light":
+          isDarkTheme = false;
+          break;
+      }
+
+      // if theme params not set, check theme from partner payload. If not set, check if user system settings is set to dark.
+      if (!themeParams) {
+        const themePayloadSet = localStorage.getItem(
+          "vscs-loading-screen-theme-color"
+        );
+        const isThemeSet = ["light", "dark"].includes(themePayloadSet);
+        isDarkTheme = !isThemeSet
+          ? !!window.matchMedia("(prefers-color-scheme: dark)").matches
+          : themePayloadSet === "dark";
+      }
+
+      // checks if dark theme is passed in through query params, or from partner payload (stored in local storage)
+      // also sets dark theme if user has set dark theme in system settings using matchMedia Web API
+      const darkThemeClassName = isGitHub ? "github-dark" : "dark";
+
+      if (isDarkTheme) {
+        document.documentElement.classList.add(darkThemeClassName);
+        document.documentElement.setAttribute("data-color-mode", "dark");
+        document.documentElement.setAttribute("data-dark-theme", "dark");
+      } else {
+        document.documentElement.setAttribute("data-color-mode", "light");
+        document.documentElement.setAttribute("data-dark-theme", "light");
+      }
+
+      // set the favicon color early to prevent flickering
+      const favicon = localStorage.getItem("vscs-loading-screen-favicon");
+      if (favicon) {
+        faviconEl.setAttribute("href", favicon);
+      }
+
+      window.workbenchPageDynamicAttributes = {
+        VSCodeCommits: {
+          stable: "b3318bc0524af3d74034b8bb8a64df0ccf35549a",
+          insider: "552af97a0170b43c9323bec62211feb184da9749",
+        },
+      };
+    </script>
+    <div class="vso-splash-screen" id="js-default-loading-screen">
+      <div class="container" id="js-default-loading-screen-container">
+        <div class="d-flex flex-auto flex-column">
+          <div>
+            <svg
+              aria-hidden="true"
+              width="96"
+              height="95"
+              viewBox="0 0 96 95"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M17.4189 45.8325C17.3612 41.0376 19.1233 36.3991 22.3501 32.852C21.8729 31.65 20.2026 26.6821 22.8273 20.0317C22.8273 20.0317 26.8837 18.7496 36.0302 24.9996C39.9458 23.9404 43.9839 23.4015 48.0402 23.397C52.0966 23.4015 56.1346 23.9404 60.0502 24.9996C69.1968 18.7496 73.2531 20.0317 73.2531 20.0317C75.8779 26.6821 74.2076 31.65 73.7303 32.852C75.5762 34.8442 76.9532 37.2238 77.7607 39.8168C78.9992 38.8951 80.5022 38.3981 82.046 38.3999C83.1373 38.4014 84.2142 38.6486 85.1969 39.123L92.005 42.4156C92.3873 42.5994 92.8128 42.6743 93.2349 42.632C93.6569 42.5898 94.0592 42.432 94.3974 42.1761C94.7357 41.9202 94.9968 41.576 95.1523 41.1814C95.3077 40.7867 95.3513 40.3569 95.2784 39.939C93.3679 28.7852 87.5822 18.6636 78.9407 11.3573C70.2992 4.05109 59.3564 0.0291069 48.0402 0C41.7065 0.0178898 35.4385 1.28451 29.5949 3.72739C23.7513 6.17026 18.4467 9.74144 13.9847 14.2366C9.5227 18.7317 5.99086 24.0626 3.59129 29.9241C1.19173 35.7857 -0.0284744 42.0629 0.000504299 48.3965C-0.0223555 58.5254 3.13589 68.4059 9.0296 76.6436C14.9233 84.8814 23.2549 91.0605 32.8488 94.3091C35.2348 94.7899 36.1098 93.2675 36.1098 91.9854C36.1098 90.8637 36.0302 87.0176 36.0302 83.0112C22.6682 85.8958 19.8845 77.2421 19.8845 77.2421C17.737 71.6332 14.5556 70.191 14.5556 70.191C10.181 67.2263 14.8737 67.2263 14.8737 67.2263C19.7254 67.5468 22.2705 72.1942 22.2705 72.1942C26.5654 79.5658 33.4851 77.4825 36.2689 76.2004C36.469 73.7456 37.5411 71.4433 39.2913 69.7103C28.6334 68.5884 17.4189 64.4219 17.4189 45.8325Z"
+                fill="var(--color-icon-tertiary)"
+              />
+              <path
+                d="M94.1593 47.8999L83.4531 42.722C82.8737 42.4399 82.2227 42.339 81.5851 42.4322C80.9474 42.5254 80.3527 42.8086 79.8783 43.2447C79.4215 43.6674 59.2657 62.1493 59.2657 62.1493L50.3379 55.338C49.9359 55.0307 49.4387 54.8746 48.9332 54.897C48.4277 54.9194 47.9462 55.1189 47.573 55.4605L44.7087 58.0801C44.4856 58.2847 44.3075 58.5334 44.1856 58.8105C44.0637 59.0875 44.0007 59.3869 44.0005 59.6896C44.0003 59.9923 44.063 60.2917 44.1845 60.5689C44.3061 60.8461 44.4839 61.0951 44.7067 61.3L52.4491 68.3991L44.7067 75.4983C44.4839 75.7032 44.3061 75.9521 44.1845 76.2293C44.063 76.5065 44.0003 76.806 44.0005 77.1086C44.0007 77.4113 44.0637 77.7107 44.1856 77.9877C44.3075 78.2648 44.4856 78.5135 44.7087 78.7181L47.573 81.3377C47.9462 81.6794 48.4277 81.8788 48.9332 81.9012C49.4387 81.9236 49.9359 81.7675 50.3379 81.4602L59.2657 74.6489C59.2657 74.6489 79.4215 93.1309 79.8783 93.5535C80.3527 93.9897 80.9474 94.2728 81.5851 94.3661C82.2227 94.4593 82.8737 94.3583 83.4531 94.0762L94.1593 88.8983C94.7116 88.6299 95.1772 88.2114 95.5028 87.6907C95.8284 87.17 96.0009 86.5682 96.0005 85.9541V50.8441C96.0009 50.23 95.8284 49.6282 95.5028 49.1075C95.1772 48.5868 94.7116 48.1683 94.1593 47.8999ZM83.0085 80.2637L67.4568 68.3991L83.0085 56.5345V80.2637Z"
+                fill="var(--color-icon-tertiary)"
+              />
+            </svg>
+            <h2>Setting up your web editor</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="js-vscode-workbench"></div>
+    <script src="/static/js/runtime.4f24b6d1.js"></script>
+    <script src="/static/js/vendors~platform-authentication~web~webeditor~workbench.7a1632ab.chunk.js"></script>
+    <script src="/static/js/vendors~web~webeditor.97b95c7f.chunk.js"></script>
+    <script src="/static/js/webeditor.49183229.chunk.js"></script>
+  </body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="GitHub web editor">
+
+    <link rel="preconnect" href="https://github.vscode-unpkg.net">
+    <link rel="preconnect" href="https://marketplace.visualstudio.com">
+    <link rel="preconnect" href="https://vscodeweb.azureedge.net">
+
+    <link id="js-favicon" rel="shortcut icon" href="/vscode-stable-favicon">
+    <link id="js-splash-screen-css" rel="stylesheet" href="/splash-screen-styles.css">
+
+    <link id="js-primer-css" rel="stylesheet" href="/primer.css">
+
+    <style type="text/css">
+      html,
+      body {
+        font-size: 10px;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <span id="js-keychain-keys" style="display:none"></span>
+
+    <script type="text/javascript">
+      const faviconEl = document.querySelector('#js-favicon');
+      const params = new URLSearchParams(location.search);
+      const themeParams = parmas.get('loadingScreenThemeColor');
+      const baseUrl = 'https://vscodeweb.azureedge.net';
+
+      const isGitHub =
+        location.hostname === 'github.dev' ||
+        location.hostname === 'github.localhost' ||
+        location.hostname.endsWith('.github.dev') ||
+        location.hostname.endsWith('.github.localhost');
+      
+      // Define trusted policy.
+      const trustedTypesPolicy =
+        window.trustedTypes &&
+        window.trustedTypes.createPolicy('default', {
+          createScriptURL(value) {
+            if (value.startsWith(baseUrl)) {
+              return value;
+            }
+            throw new Error(`Invalid script url: ${value}`);
+          }
+        });
+    </script>
+  </body>
+</html>
