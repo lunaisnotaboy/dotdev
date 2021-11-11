@@ -52,6 +52,65 @@
             throw new Error(`Invalid script url: ${value}`);
           }
         });
+      
+      // Theme setting from query param should
+      // override all theme settings.
+      let isDarkTheme = undefined;
+      switch (themeParams) {
+        case 'dark':
+          isDarkTheme = true;
+          break;
+        case 'light':
+          isDarkTheme = false;
+          break;
+      }
+
+      // If theme params not set, check theme
+      // from partner payload. If not set,
+      // check if user system settings is set
+      // to dark.
+      if (!themeParams) {
+        const themePayloadSet = localStorage.getItem(
+          'vscs-loading-screen-theme-color'
+        );
+        const isThemeSet = ['light', 'dark'].includes(themePayloadSet);
+        isDarkTheme = !isThemeSet
+          ? !!window.matchMedia('(prefers-color-scheme: dark)').matches
+          : themePayloadSet === 'dark';
+      }
+
+      // Checks if dark theme is passed in
+      // through query params, or from
+      // partner payload (stored in local
+      // storage).
+      //
+      // Also sets dark theme if user has set
+      // dark theme in system settings using
+      // matchMedia Web API.
+      const darkThemeClassName = isGitHub ? 'github-dark' : 'dark';
+
+      if (isDarkTheme) {
+        document.documentElement.classList.add(darkThemeClassName);
+        document.documentElement.setAttribute('data-color-mode', 'dark');
+        document.documentElement.setAttribute('data-dark-theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-color-mode', 'light');
+        document.documentElement.setAttribute('data-dark-theme', 'light');
+      }
+
+      // Set the favicon color early to
+      // prevent flickering.
+      const favicon = localStorage.getItem('vscs-loading-screen-favicon');
+      if (favicon) {
+        faviconEl.setAttribute('href', favicon);
+      }
+
+      window.workbenchPageDynamicAttributes = {
+        VSCodeCommits: {
+          stable: '',
+          insider: ''
+        }
+      };
     </script>
   </body>
 </html>
